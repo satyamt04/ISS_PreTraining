@@ -1,0 +1,80 @@
+Dec 23, 2024 8:06:53 PM Multithreading main
+INFO: Starting Volatile Example...
+Dec 23, 2024 8:06:54 PM Multithreading main
+INFO: Starting synchronized counter example...
+Dec 23, 2024 8:06:54 PM Multithreading main
+INFO: Final count: 2000
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: List of Students:
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=1, name='Alice'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: 
+After removing the first Student from List:
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: 
+Set of Students:
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=1, name='Alice'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: 
+Map of Students:
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=2, name='Bob'} Value: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=1, name='Alice'} Value: Student{id=1, name='Alice'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=3, name='Charlie'} Value: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: 
+After adding a duplicate Student as Key to Map:
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=2, name='Bob'} Value: Student{id=2, name='Bob'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=1, name='Alice'} Value: Student{id=1, name='Alice'}
+Dec 23, 2024 8:16:51 PM CollectionsExample main
+INFO: Key: Student{id=3, name='Charlie'} Value: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Sorted by ID (using Comparable):
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=1, name='Alice'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 
+Sorted by Name (using Comparator):
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=1, name='Alice'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=2, name='Bob'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: Student{id=3, name='Charlie'}
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 
+Sorted List of Integers:
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 1
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 3
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 5
+Dec 23, 2024 8:22:05 PM SortingObjects main
+INFO: 8
