@@ -1,0 +1,102 @@
+CREATE PROCEDURE ManageStudentData
+    @student_id INT = NULL,
+    @first_name VARCHAR(100),
+    @last_name VARCHAR(100),
+    @middle_name VARCHAR(100),
+    @branch VARCHAR(100),
+    @marks INT,
+    @address VARCHAR(500),
+    @pin_code INT,
+    @action NVARCHAR(10) -- Possible values: 'INSERT', 'UPDATE', 'DELETE'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF @action = 'INSERT'
+        BEGIN
+            -- Insert into Student table
+            INSERT INTO Student (first_name, last_name, middle_name, branch, marks)
+            VALUES (@first_name, @last_name, @middle_name, @branch, @marks);
+
+            -- Get the newly generated student_id
+            SET @student_id = SCOPE_IDENTITY();
+
+            -- Insert into Address table
+            INSERT INTO Address (student_id, address, pin_code)
+            VALUES (@student_id, @address, @pin_code);
+
+            -- Insert into Student_Statistics only if percentage > 40
+            IF (@marks >= 40)
+            BEGIN
+                DECLARE @percentage FLOAT = (@marks * 100.0 / 100.0); -- Calculate percentage
+                INSERT INTO Student_Statistics (student_id, full_name, branch, address, percentage)
+                VALUES (@student_id, @first_name + ' ' + @middle_name + ' ' + @last_name, @branch, @address, @percentage);
+            END
+        END
+
+        ELSE IF @action = 'UPDATE'
+        BEGIN
+            -- Update Student table
+            UPDATE Student
+            SET first_name = @first_name,
+                last_name = @last_name,
+                middle_name = @middle_name,
+                branch = @branch,
+                marks = @marks
+            WHERE student_id = @student_id;
+
+            -- Update Address table
+            UPDATE Address
+            SET address = @address,
+                pin_code = @pin_code
+            WHERE student_id = @student_id;
+
+            -- Update Student_Statistics only if percentage > 40
+            IF (@marks >= 40)
+            BEGIN
+                DECLARE @percentage FLOAT = (@marks * 100.0 / 100.0); -- Calculate percentage
+                IF EXISTS (SELECT 1 FROM Student_Statistics WHERE student_id = @student_id)
+                BEGIN
+                    UPDATE Student_Statistics
+                    SET full_name = @first_name + ' ' + @middle_name + ' ' + @last_name,
+                        branch = @branch,
+                        address = @address,
+                        percentage = @percentage
+                    WHERE student_id = @student_id;
+                END
+                ELSE
+                BEGIN
+                    INSERT INTO Student_Statistics (student_id, full_name, branch, address, percentage)
+                    VALUES (@student_id, @first_name + ' ' + @middle_name + ' ' + @last_name, @branch, @address, @percentage);
+                END
+            END
+            ELSE
+            BEGIN
+                -- If percentage < 40, remove from Student_Statistics
+                DELETE FROM Student_Statistics WHERE student_id = @student_id;
+            END
+        END
+
+        ELSE IF @action = 'DELETE'
+        BEGIN
+            -- Delete from Student_Statistics
+            DELETE FROM Student_Statistics WHERE student_id = @student_id;
+
+            -- Delete from Address table
+            DELETE FROM Address WHERE student_id = @student_id;
+
+            -- Delete from Student table
+            DELETE FROM Student WHERE student_id = @student_id;
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        PRINT 'An error occurred. Transaction rolled back.';
+        THROW;
+    END CATCH
+END;
