@@ -1,102 +1,43 @@
-CREATE PROCEDURE ManageStudentData
-    @student_id INT = NULL,
-    @first_name VARCHAR(100),
-    @last_name VARCHAR(100),
-    @middle_name VARCHAR(100),
-    @branch VARCHAR(100),
-    @marks INT,
-    @address VARCHAR(500),
-    @pin_code INT,
-    @action NVARCHAR(10) -- Possible values: 'INSERT', 'UPDATE', 'DELETE'
-AS
-BEGIN
-    SET NOCOUNT ON;
+import pandas as pd
 
-    DECLARE @percentage FLOAT = (@marks * 100.0 / 100.0); -- Precompute percentage
+# Read the CSV file
+df = pd.read_csv('sample.csv')
 
-    BEGIN TRY
-        BEGIN TRANSACTION;
+# Initialize the nested dictionary
+combinations = {}
 
-        IF @action = 'INSERT'
-        BEGIN
-            -- Insert into Student table
-            INSERT INTO Student (first_name, last_name, middle_name, branch, marks)
-            VALUES (@first_name, @last_name, @middle_name, @branch, @marks);
+# Populate the nested dictionary
+for _, row in df.iterrows():
+    client_id = row['CLIENT_ID']
+    broker_id = row['BROKER_ID']
+    broker_name = row['BROKER_NAME']
+    geo_id = row['GEO_ID']
+    territory = row['TERRITORY']
+    
+    # Create nested dictionary structure
+    if client_id not in combinations:
+        combinations[client_id] = {}
+    if broker_id not in combinations[client_id]:
+        combinations[client_id][broker_id] = {}
+    if broker_name not in combinations[client_id][broker_id]:
+        combinations[client_id][broker_id][broker_name] = {}
+    if geo_id not in combinations[client_id][broker_id][broker_name]:
+        combinations[client_id][broker_id][broker_name][geo_id] = set()
+    
+    # Add the territory
+    combinations[client_id][broker_id][broker_name][geo_id].add(territory)
 
-            -- Get the newly generated student_id
-            SET @student_id = SCOPE_IDENTITY();
+# Find combinations with more than one territory
+result = {}
+for client_id, broker_data in combinations.items():
+    for broker_id, broker_name_data in broker_data.items():
+        for broker_name, geo_data in broker_name_data.items():
+            for geo_id, territories in geo_data.items():
+                if len(territories) > 1:
+                    key = (client_id, broker_id, broker_name, geo_id)
+                    result[key] = territories
 
-            -- Insert into Address table
-            INSERT INTO Address (student_id, address, pin_code)
-            VALUES (@student_id, @address, @pin_code);
-
-            -- Insert into Student_Statistics only if percentage > 40
-            IF (@percentage >= 40)
-            BEGIN
-                INSERT INTO Student_Statistics (student_id, full_name, branch, address, percentage)
-                VALUES (@student_id, @first_name + ' ' + @middle_name + ' ' + @last_name, @branch, @address, @percentage);
-            END
-        END
-
-        ELSE IF @action = 'UPDATE'
-        BEGIN
-            -- Update Student table
-            UPDATE Student
-            SET first_name = @first_name,
-                last_name = @last_name,
-                middle_name = @middle_name,
-                branch = @branch,
-                marks = @marks
-            WHERE student_id = @student_id;
-
-            -- Update Address table
-            UPDATE Address
-            SET address = @address,
-                pin_code = @pin_code
-            WHERE student_id = @student_id;
-
-            -- Update Student_Statistics only if percentage > 40
-            IF (@percentage >= 40)
-            BEGIN
-                IF EXISTS (SELECT 1 FROM Student_Statistics WHERE student_id = @student_id)
-                BEGIN
-                    UPDATE Student_Statistics
-                    SET full_name = @first_name + ' ' + @middle_name + ' ' + @last_name,
-                        branch = @branch,
-                        address = @address,
-                        percentage = @percentage
-                    WHERE student_id = @student_id;
-                END
-                ELSE
-                BEGIN
-                    INSERT INTO Student_Statistics (student_id, full_name, branch, address, percentage)
-                    VALUES (@student_id, @first_name + ' ' + @middle_name + ' ' + @last_name, @branch, @address, @percentage);
-                END
-            END
-            ELSE
-            BEGIN
-                -- If percentage < 40, remove from Student_Statistics
-                DELETE FROM Student_Statistics WHERE student_id = @student_id;
-            END
-        END
-
-        ELSE IF @action = 'DELETE'
-        BEGIN
-            -- Delete from Student_Statistics
-            DELETE FROM Student_Statistics WHERE student_id = @student_id;
-
-            -- Delete from Address table
-            DELETE FROM Address WHERE student_id = @student_id;
-
-            -- Delete from Student table
-            DELETE FROM Student WHERE student_id = @student_id;
-        END
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        PRINT 'An error occurred. Transaction rolled back.';
-        THROW;
-    END CATCH
-END;
+# Print the results
+print("Combinations with more than one territory:")
+for key, territories in result.items():
+    print(f"{key}: {territories}")
